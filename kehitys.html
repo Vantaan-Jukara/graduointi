@@ -53,4 +53,12 @@ $('send-candidate').onclick=()=>sendMail(state.candidateEmail,'Jukara – keltai
 $('send-passport').onclick=()=>{if(state.decision!=='hyvaksytty'){$('send-status').textContent='Passisihteerille ilmoitetaan vain hyväksytty vyökoe.';return;}sendMail(state.passportEmail,'Jukara – keltaisen vyön graduointi',`${report()}\n\nLiitä tarvittaessa arvioinnin PDF tähän viestiin ennen lähettämistä.`,true)};
 $('send-suomisport').onclick=()=>{if(state.decision!=='hyvaksytty'){$('send-status').textContent='Suomisportiin ilmoitetaan vain hyväksytty vyökoe.';return;}sendMail(state.suomisportEmail,'Jukara – vyöarvosuoritus Suomisportiin',`Nimi: ${state.name}\nSuoritettu vyöarvo: 5. kyu (keltainen)\nPäivämäärä: ${state.examDate}\nGraduoija: ${state.examiner}`,false)};
 $('print').onclick=()=>window.print();$('reset').onclick=()=>{if(confirm('Poistetaanko kaikki tämän lomakkeen tallennetut tiedot?')){state={name:'',scores:Array(items.length).fill(-1),comment:'',teacher:'',approval:false,date:'',examScores:Array(items.length).fill(null),examiner:'',examDate:'',examComment:'',decision:'',candidateEmail:'',passportEmail:'',suomisportEmail:''};$('code').value='';render()}};render();
-</script></body></html>
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+ <script>
+const SUPABASE_URL = 'https://ahozpinochjixnnundvm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Do7SnnEgI7Nc4XFDfut7rw_gxOUmP9Z';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+ </script></body></html>
