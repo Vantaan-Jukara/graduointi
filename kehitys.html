@@ -60,5 +60,23 @@ $('print').onclick=()=>window.print();$('reset').onclick=()=>{if(confirm('Poiste
 const SUPABASE_URL = 'https://ahozpinochjixnnundvm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Do7SnnEgI7Nc4XFDfut7rw_gxOUmP9Z';
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+supabaseClient.auth.onAuthStateChange((event) => {
+  if (event !== 'PASSWORD_RECOVERY') return;
 
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <h2>Vaihda salasana</h2>
+    <input id="new-password" type="password" placeholder="Uusi salasana">
+    <button id="save-password">Tallenna salasana</button>
+    <p id="password-status"></p>
+  `;
+  document.body.prepend(box);
+
+  document.getElementById('save-password').onclick = async () => {
+    const password = document.getElementById('new-password').value;
+    const { error } = await supabaseClient.auth.updateUser({ password });
+    document.getElementById('password-status').textContent =
+      error ? error.message : 'Salasana vaihdettu onnistuneesti.';
+  };
+});
  </script></body></html>
