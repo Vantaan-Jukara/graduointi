@@ -79,4 +79,18 @@ supabaseClient.auth.onAuthStateChange((event) => {
       error ? error.message : 'Salasana vaihdettu onnistuneesti.';
   };
 });
+  async function haeGraduointijono() {
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('id, kokelas_nimi, vyöarvo, tila')
+    .eq('tila', 'jonossa')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Graduointijonon haku epäonnistui:', error);
+    return;
+  }
+
+  console.table(data);
+}
  </script></body></html>
