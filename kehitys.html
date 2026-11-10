@@ -93,4 +93,20 @@ supabaseClient.auth.onAuthStateChange((event) => {
 
   console.table(data);
 }
+  const jonoLaatikko = document.createElement('section');
+jonoLaatikko.className = 'card';
+jonoLaatikko.innerHTML = `
+<h2>Graduointijono</h2>
+<p>Valitse arvioitavat kokelaat.</p>
+<label for="valitse-tori">Tori</label>
+<select id="valitse-tori">
+  <option value="">Valitse tori</option>
+</select>
+<label for="valitse-uke">Uke</label>
+<select id="valitse-uke">
+  <option value="">Valitse uke</option>
+</select>
+<p id="jono-viesti"></p>
+`;
+document.body.prepend(jonoLaatikko);
  </script></body></html>
