@@ -135,4 +135,26 @@ document.body.prepend(jonoLaatikko);
   }
 }
   taytaKokelasvalinnat();
+  const arviointialueet = document.createElement('div');
+arviointialueet.innerHTML = `
+  <section class="card" id="tori-arviointi" hidden>
+    <h2>Torin arviointi</h2>
+    <p id="tori-nimi"></p>
+  </section>
+  <section class="card" id="uke-arviointi" hidden>
+    <h2>Uken arviointi</h2>
+    <p id="uke-nimi"></p>
+  </section>
+`;
+jonoLaatikko.after(arviointialueet);
+
+for (const rooli of ['tori', 'uke']) {
+  document.getElementById('valitse-' + rooli)
+    .addEventListener('change', function () {
+      const alue = document.getElementById(rooli + '-arviointi');
+      alue.hidden = !this.value;
+      document.getElementById(rooli + '-nimi').textContent =
+        this.value ? this.selectedOptions[0].textContent : '';
+    });
+}
  </script></body></html>
