@@ -109,4 +109,30 @@ jonoLaatikko.innerHTML = `
 <p id="jono-viesti"></p>
 `;
 document.body.prepend(jonoLaatikko);
+  async function taytaKokelasvalinnat() {
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('id, kokelas_nimi, vyöarvo')
+    .eq('tila', 'jonossa')
+    .order('created_at', { ascending: true });
+    if (error) {
+    document.getElementById('jono-viesti').textContent =
+      'Graduointijonon haku epäonnistui: ' + error.message;
+    return;
+  }
+
+  for (const id of ['valitse-tori', 'valitse-uke']) {
+    const valinta = document.getElementById(id);
+    valinta.length = 1;
+
+    for (const kokelas of data) {
+      const vaihtoehto = document.createElement('option');
+      vaihtoehto.value = kokelas.id;
+      vaihtoehto.textContent =
+        kokelas.kokelas_nimi + ' (' + kokelas.vyöarvo + ')';
+      valinta.appendChild(vaihtoehto);
+    }
+  }
+}
+  taytaKokelasvalinnat();
  </script></body></html>
