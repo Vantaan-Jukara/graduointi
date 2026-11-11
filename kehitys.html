@@ -289,5 +289,52 @@ luoParinPisteytys('uke');
     .forEach((valinta, i) => {
       valinta.value = pisteet[i] == null ? '' : String(pisteet[i]);
     });
+ naytaPariarvioinninTulos(rooli);  
 }
+  function laskePariarviointi(rooli) {
+  const pisteet = pariarvioinnit[rooli].pisteet;
+  const arvioidut = pisteet.filter(p => Number.isInteger(p) && p >= 0 && p <= 3);
+
+  if (arvioidut.length !== items.length) {
+    return {
+      hyvaksytty: false,
+      valmis: false,
+      teksti: `Arvioitu ${arvioidut.length}/${items.length} kohtaa`
+    };
+  }
+
+  const keskiarvo =
+    pisteet.reduce((summa, p) => summa + p, 0) / pisteet.length;
+
+  const ukemitOK = [1, 2, 3].every(i => pisteet[i] >= 2);
+  const hyvaksytty = ukemitOK && keskiarvo >= 2;
+
+  return {
+    hyvaksytty,
+    valmis: true,
+    teksti: `Keskiarvo ${keskiarvo.toFixed(2)} – ${
+      hyvaksytty ? 'Hyväksymisrajat täyttyvät' : 'Hyväksymisrajat eivät täyty'
+    }`
+  };
+}
+function naytaPariarvioinninTulos(rooli) {
+  const tulos = laskePariarviointi(rooli);
+  document.getElementById(rooli + '-tulos').textContent = tulos.teksti;
+}
+
+for (const rooli of ['tori', 'uke']) {
+  const alue = document.getElementById(rooli + '-arviointi');
+
+  const tulosKentta = document.createElement('p');
+  tulosKentta.id = rooli + '-tulos';
+  alue.appendChild(tulosKentta);
+
+  alue.addEventListener('change', (event) => {
+    if (event.target.matches('select')) {
+      naytaPariarvioinninTulos(rooli);
+    }
+  });
+
+  naytaPariarvioinninTulos(rooli);
+}  
  </script></body></html>
