@@ -285,10 +285,12 @@ luoParinPisteytys('uke');
   pariarvioinnit[rooli].pisteet = [...pisteet];
   pariarvioinnit[rooli].paatos = data.arviointi.paatos || '';
 
-  document.querySelectorAll('#' + rooli + '-arviointi select')
+ document.querySelectorAll('#' + rooli + '-arviointi .exam-row select')
     .forEach((valinta, i) => {
       valinta.value = pisteet[i] == null ? '' : String(pisteet[i]);
     });
+   document.getElementById(rooli + '-paatos').value =
+  pariarvioinnit[rooli].paatos;
  naytaPariarvioinninTulos(rooli);  
 }
   function laskePariarviointi(rooli) {
@@ -337,4 +339,31 @@ for (const rooli of ['tori', 'uke']) {
 
   naytaPariarvioinninTulos(rooli);
 }  
+ for (const rooli of ['tori', 'uke']) {
+  const alue = document.getElementById(rooli + '-arviointi');
+
+  const otsikko = document.createElement('h3');
+  otsikko.textContent = 'Graduoijan päätös';
+  alue.appendChild(otsikko);
+
+  const paatos = document.createElement('select');
+  paatos.id = rooli + '-paatos';
+
+  for (const [arvo, teksti] of [
+    ['', 'Ei päätöstä'],
+    ['hyvaksytty', 'Hyväksytty'],
+    ['hylatty', 'Hylätty']
+  ]) {
+    const vaihtoehto = document.createElement('option');
+    vaihtoehto.value = arvo;
+    vaihtoehto.textContent = teksti;
+    paatos.appendChild(vaihtoehto);
+  }
+
+  paatos.addEventListener('change', () => {
+    pariarvioinnit[rooli].paatos = paatos.value;
+  });
+
+  alue.appendChild(paatos);
+} 
  </script></body></html>
