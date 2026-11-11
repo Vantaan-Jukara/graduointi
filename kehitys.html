@@ -455,6 +455,18 @@ if (authError || !user) {
   alert('Opettajan kirjautuminen vaaditaan.');
   return;
 }
+   const { data: opettajaTiedot, error: rooliVirhe } =
+  await supabaseClient
+    .from('kayttajaroolit')
+    .select('nimi')
+    .eq('user_id', user.id)
+    .eq('rooli', 'opettaja')
+    .single();
+
+if (rooliVirhe || !opettajaTiedot?.nimi) {
+  alert('Opettajan käyttöoikeutta tai nimeä ei löytynyt.');
+  return;
+}
 const hakemusId = state.hakemusId;
 
   if (!confirm('Siirretäänkö ' + state.name +
@@ -466,7 +478,7 @@ const hakemusId = state.hakemusId;
   kokelas_nimi: state.name.trim(),
   vyöarvo: '5.kyu',
   tila: 'jonossa',
-  opettaja: state.teacher.trim(),
+ opettaja: opettajaTiedot.nimi.trim(),
      puoltaja_id: user.id,
   puolto: state.approval,
   puolto_pvm: state.date,
