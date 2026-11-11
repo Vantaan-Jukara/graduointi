@@ -430,4 +430,46 @@ alue.querySelectorAll('select, button').forEach(kentta => {
   document.getElementById(rooli + '-arviointi')
     .appendChild(painike);
 }
+ async function siirraGraduointijonoon() {
+  if (!state.name.trim()) {
+    alert('Oppilaan nimi puuttuu.');
+    return;
+  }
+
+  if (!state.teacher.trim() || !state.approval) {
+    alert('Opettajan nimi ja puolto vaaditaan.');
+    return;
+  }
+
+  if (!confirm('Siirretäänkö ' + state.name +
+      ' graduointijonoon?')) return;
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .insert({
+      kokelas_nimi: state.name.trim(),
+      vyöarvo: '5.kyu',
+      tila: 'jonossa'
+    })
+    .select('id');
+
+  if (error || !data || data.length !== 1) {
+    alert('Siirto epäonnistui: ' +
+      (error ? error.message : 'Tuntematon virhe'));
+    return;
+  }
+
+  alert('Kokelas siirretty graduointijonoon.');
+} 
+  const opettajanOsio = document.querySelector('.card.teacher');
+
+const siirtoPainike = document.createElement('button');
+siirtoPainike.type = 'button';
+siirtoPainike.textContent = 'Siirrä graduointijonoon';
+
+siirtoPainike.addEventListener('click', () => {
+  siirraGraduointijonoon();
+});
+
+opettajanOsio.appendChild(siirtoPainike);
  </script></body></html>
