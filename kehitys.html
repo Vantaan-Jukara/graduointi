@@ -166,6 +166,9 @@ for (const rooli of ['tori', 'uke']) {
   ).forEach(valinta => valinta.value = '');
 }
      pariarvioinnit[rooli].kokelasId = this.value ? Number(this.value) : null;
+     if (this.value) {
+  palautaPariarviointi(rooli);
+}
       alue.hidden = !this.value;
       document.getElementById(rooli + '-nimi').textContent =
         this.value ? this.selectedOptions[0].textContent : '';
@@ -258,5 +261,19 @@ luoParinPisteytys('uke');
 
   document.getElementById(rooli + '-arviointi')
     .appendChild(painike);
+}
+    return;
+  }
+
+  const pisteet = data.arviointi?.pisteet;
+  if (!Array.isArray(pisteet) || pisteet.length !== items.length) return;
+
+  pariarvioinnit[rooli].pisteet = [...pisteet];
+  pariarvioinnit[rooli].paatos = data.arviointi.paatos || '';
+
+  document.querySelectorAll('#' + rooli + '-arviointi select')
+    .forEach((valinta, i) => {
+      valinta.value = pisteet[i] == null ? '' : String(pisteet[i]);
+    });
 }
  </script></body></html>
