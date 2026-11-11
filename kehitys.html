@@ -440,18 +440,25 @@ alue.querySelectorAll('select, button').forEach(kentta => {
     alert('Opettajan nimi ja puolto vaaditaan.');
     return;
   }
+  if (!state.date.trim()) {
+  alert('Opettajan puollon päiväys puuttuu.');
+  return;
+}
 
   if (!confirm('Siirretäänkö ' + state.name +
       ' graduointijonoon?')) return;
 
   const { data, error } = await supabaseClient
     .from('graduointijono')
-    .insert({
-      kokelas_nimi: state.name.trim(),
-      vyöarvo: '5.kyu',
-      tila: 'jonossa'
-    })
-    .select('id');
+   .insert({
+  kokelas_nimi: state.name.trim(),
+  vyöarvo: '5.kyu',
+  tila: 'jonossa',
+  opettaja: state.teacher.trim(),
+  puolto: state.approval,
+  puolto_pvm: state.date
+})
+  .select('id');
 
   if (error || !data || data.length !== 1) {
     alert('Siirto epäonnistui: ' +
