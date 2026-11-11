@@ -156,6 +156,9 @@ for (const rooli of ['tori', 'uke']) {
   document.getElementById('valitse-' + rooli)
     .addEventListener('change', function () {
       const alue = document.getElementById(rooli + '-arviointi');
+     alue.querySelectorAll('select, button').forEach(kentta => {
+  kentta.disabled = false;
+});
      if (pariarvioinnit[rooli].kokelasId !==
     (this.value ? Number(this.value) : null)) {
   pariarvioinnit[rooli].pisteet.fill(null);
@@ -408,7 +411,11 @@ for (const rooli of ['tori', 'uke']) {
     alert('Vahvistaminen epäonnistui.');
     return;
   }
+const alue = document.getElementById(rooli + '-arviointi');
 
+alue.querySelectorAll('select, button').forEach(kentta => {
+  kentta.disabled = true;
+});
   alert('Päätös vahvistettu.');
 } 
   for (const rooli of ['tori', 'uke']) {
