@@ -450,6 +450,10 @@ if (localStorage.getItem(siirtoAvain)) {
   alert('Opettajan puollon päiväys puuttuu.');
   return;
 }
+  if (!hakemusId) {
+  hakemusId = crypto.randomUUID();
+  localStorage.setItem(hakemusAvain, hakemusId);
+}
 
   if (!confirm('Siirretäänkö ' + state.name +
       ' graduointijonoon?')) return;
@@ -462,7 +466,8 @@ if (localStorage.getItem(siirtoAvain)) {
   tila: 'jonossa',
   opettaja: state.teacher.trim(),
   puolto: state.approval,
-  puolto_pvm: state.date
+  puolto_pvm: state.date,
+hakemus_id: hakemusId
 })
   .select('id');
 
