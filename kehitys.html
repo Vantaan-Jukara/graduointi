@@ -219,4 +219,44 @@ for (const rooli of ['tori', 'uke']) {
 
 luoParinPisteytys('tori');
 luoParinPisteytys('uke');
+  async function tallennaPariarviointi(rooli) {
+  const tiedot = pariarvioinnit[rooli];
+
+  if (!tiedot.kokelasId) {
+    alert('Valitse ensin kokelas.');
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .update({
+      arviointi: {
+        pisteet: tiedot.pisteet,
+        paatos: tiedot.paatos
+      }
+    })
+    .eq('id', tiedot.kokelasId)
+    .eq('tila', 'jonossa')
+    .select('id');
+
+  if (error || !data || data.length !== 1) {
+    alert('Tallennus epäonnistui: ' +
+      (error ? error.message : 'Kokelasta ei löytynyt.'));
+    return;
+  }
+
+  alert('Arviointi tallennettu.');
+}
+  for (const rooli of ['tori', 'uke']) {
+  const painike = document.createElement('button');
+  painike.type = 'button';
+  painike.textContent = 'Tallenna arviointi';
+
+  painike.addEventListener('click', () => {
+    tallennaPariarviointi(rooli);
+  });
+
+  document.getElementById(rooli + '-arviointi')
+    .appendChild(painike);
+}
  </script></body></html>
