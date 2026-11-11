@@ -116,7 +116,7 @@ document.body.prepend(jonoLaatikko);
   async function taytaKokelasvalinnat() {
   const { data, error } = await supabaseClient
     .from('graduointijono')
-    .select('id, kokelas_nimi, vyöarvo')
+   .select('id, kokelas_nimi, vyöarvo, opettaja, opettajan_kommentti')
     .eq('tila', 'jonossa')
     .order('created_at', { ascending: true });
     if (error) {
@@ -155,10 +155,15 @@ arviointialueet.innerHTML = `
   </section>
 `;
 jonoLaatikko.after(arviointialueet);
-
+for (const rooli of ['tori', 'uke']) {
+  const kommentti = document.createElement('p');
+  kommentti.id = rooli + '-opettajan-kommentti';
+  document.getElementById(rooli + '-arviointi')
+    .appendChild(kommentti);
+}
 for (const rooli of ['tori', 'uke']) {
   document.getElementById('valitse-' + rooli)
-    .addEventListener('change', function () {
+   .addEventListener('change', async function () {
       const alue = document.getElementById(rooli + '-arviointi');
      alue.querySelectorAll('select, button').forEach(kentta => {
   kentta.disabled = false;
@@ -179,6 +184,28 @@ for (const rooli of ['tori', 'uke']) {
       alue.hidden = !this.value;
       document.getElementById(rooli + '-nimi').textContent =
         this.value ? this.selectedOptions[0].textContent : '';
+     const kommenttikentta =
+  document.getElementById(rooli + '-opettajan-kommentti');
+
+kommenttikentta.textContent = '';
+
+if (this.value) {
+  const valittuId = this.value;
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('opettaja, opettajan_kommentti')
+    .eq('id', valittuId)
+    .single();
+
+  if (this.value !== valittuId) return;
+
+  kommenttikentta.textContent = error
+    ? 'Opettajan kommentin haku epäonnistui.'
+    : 'Opettaja: ' + (data.opettaja || 'Ei ilmoitettu') +
+      ' — Kommentti: ' +
+      (data.opettajan_kommentti || 'Ei kommenttia');
+}
     });
 }
   const pariarvioinnit = {
