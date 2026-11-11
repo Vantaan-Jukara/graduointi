@@ -435,7 +435,13 @@ alue.querySelectorAll('select, button').forEach(kentta => {
     alert('Oppilaan nimi puuttuu.');
     return;
   }
+const siirtoAvain = 'jukara-siirretty-' +
+  state.name.trim().toLowerCase();
 
+if (localStorage.getItem(siirtoAvain)) {
+  alert('Tämä kokelas on jo siirretty graduointijonoon.');
+  return;
+}
   if (!state.teacher.trim() || !state.approval) {
     alert('Opettajan nimi ja puolto vaaditaan.');
     return;
@@ -465,7 +471,9 @@ alue.querySelectorAll('select, button').forEach(kentta => {
       (error ? error.message : 'Tuntematon virhe'));
     return;
   }
-
+localStorage.setItem('jukara-siirretty-' + state.name.trim().toLowerCase(), String(data[0].id));
+  siirtoPainike.disabled = true;
+siirtoPainike.textContent = 'Siirretty graduointijonoon';
   alert('Kokelas siirretty graduointijonoon.');
 } 
   const opettajanOsio = document.querySelector('.card.teacher');
