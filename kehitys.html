@@ -471,7 +471,7 @@ hakemus_id: hakemusId
       (error ? error.message : 'Tuntematon virhe'));
     return;
   }
-
+localStorage.setItem('jukara-lahetetty-' + state.hakemusId, 'true');
   siirtoPainike.disabled = true;
 siirtoPainike.textContent = 'Siirretty graduointijonoon';
   alert('Kokelas siirretty graduointijonoon.');
@@ -487,6 +487,10 @@ siirtoPainike.addEventListener('click', () => {
 });
 
 opettajanOsio.appendChild(siirtoPainike);
+   if (localStorage.getItem('jukara-lahetetty-' + state.hakemusId) === 'true') {
+  siirtoPainike.disabled = true;
+  siirtoPainike.textContent = 'Siirretty graduointijonoon';
+}
  const uusiPainike = document.createElement('button');
 uusiPainike.type = 'button';
 uusiPainike.textContent = 'Uusi hakemus';
