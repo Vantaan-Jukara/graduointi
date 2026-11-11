@@ -156,6 +156,7 @@ for (const rooli of ['tori', 'uke']) {
   document.getElementById('valitse-' + rooli)
     .addEventListener('change', function () {
       const alue = document.getElementById(rooli + '-arviointi');
+     pariarvioinnit[rooli].kokelasId = this.value ? Number(this.value) : null;
       alue.hidden = !this.value;
       document.getElementById(rooli + '-nimi').textContent =
         this.value ? this.selectedOptions[0].textContent : '';
