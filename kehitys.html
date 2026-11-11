@@ -523,4 +523,26 @@ uusiPainike.addEventListener('click', () => {
 });
 
 document.querySelector('.card').appendChild(uusiPainike); 
+   async function naytaKirjautunutOpettaja() {
+  const kentta = document.getElementById('teacher');
+  kentta.readOnly = true;
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('kayttajaroolit')
+    .select('nimi')
+    .eq('user_id', user.id)
+    .eq('rooli', 'opettaja')
+    .single();
+
+  if (error || !data?.nimi) return;
+
+  state.teacher = data.nimi.trim();
+  kentta.value = state.teacher;
+  save();
+}
+
+naytaKirjautunutOpettaja();
  </script></body></html>
