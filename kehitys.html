@@ -156,6 +156,15 @@ for (const rooli of ['tori', 'uke']) {
   document.getElementById('valitse-' + rooli)
     .addEventListener('change', function () {
       const alue = document.getElementById(rooli + '-arviointi');
+     if (pariarvioinnit[rooli].kokelasId !==
+    (this.value ? Number(this.value) : null)) {
+  pariarvioinnit[rooli].pisteet.fill(null);
+  pariarvioinnit[rooli].paatos = '';
+
+  document.querySelectorAll(
+    '#' + rooli + '-arviointi select'
+  ).forEach(valinta => valinta.value = '');
+}
      pariarvioinnit[rooli].kokelasId = this.value ? Number(this.value) : null;
       alue.hidden = !this.value;
       document.getElementById(rooli + '-nimi').textContent =
