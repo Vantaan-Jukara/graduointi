@@ -366,4 +366,61 @@ for (const rooli of ['tori', 'uke']) {
 
   alue.appendChild(paatos);
 } 
+ async function vahvistaPariarviointi(rooli) {
+  const tiedot = pariarvioinnit[rooli];
+  const tulos = laskePariarviointi(rooli);
+
+  if (!tiedot.kokelasId) {
+    alert('Valitse ensin kokelas.');
+    return;
+  }
+
+  if (!tiedot.paatos) {
+    alert('Valitse ensin graduoijan päätös.');
+    return;
+  }
+
+  if (tiedot.paatos === 'hyvaksytty' && !tulos.hyvaksytty) {
+    alert('Hyväksymisrajat eivät täyty.');
+    return;
+  }
+
+  const nimi = document.getElementById('valitse-' + rooli)
+    .selectedOptions[0].textContent;
+
+  if (!confirm('Vahvistetaanko kokelaan ' + nimi +
+      ' päätös: ' + tiedot.paatos + '?')) return;
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .update({
+      tila: tiedot.paatos,
+      arviointi: {
+        pisteet: tiedot.pisteet,
+        paatos: tiedot.paatos
+      }
+    })
+    .eq('id', tiedot.kokelasId)
+    .eq('tila', 'jonossa')
+    .select('id');
+
+  if (error || !data || data.length !== 1) {
+    alert('Vahvistaminen epäonnistui.');
+    return;
+  }
+
+  alert('Päätös vahvistettu.');
+} 
+  for (const rooli of ['tori', 'uke']) {
+  const painike = document.createElement('button');
+  painike.type = 'button';
+  painike.textContent = 'Vahvista päätös';
+
+  painike.addEventListener('click', () => {
+    vahvistaPariarviointi(rooli);
+  });
+
+  document.getElementById(rooli + '-arviointi')
+    .appendChild(painike);
+}
  </script></body></html>
