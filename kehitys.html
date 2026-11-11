@@ -157,4 +157,52 @@ for (const rooli of ['tori', 'uke']) {
         this.value ? this.selectedOptions[0].textContent : '';
     });
 }
+  const pariarvioinnit = {
+  tori: {
+    kokelasId: null,
+    pisteet: Array(items.length).fill(null),
+    paatos: ''
+  },
+  uke: {
+    kokelasId: null,
+    pisteet: Array(items.length).fill(null),
+    paatos: ''
+  }
+};
+  function luoParinPisteytys(rooli) {
+  const alue = document.getElementById(rooli + '-arviointi');
+
+  const otsikko = document.createElement('h3');
+  otsikko.textContent = 'Graduoijan pisteytys';
+  alue.appendChild(otsikko);
+
+  items.forEach((kohde, i) => {
+    const rivi = document.createElement('div');
+    rivi.className = 'exam-row';
+
+    const nimi = document.createElement('div');
+    nimi.textContent = (i + 1) + '. ' + kohde;
+    rivi.appendChild(nimi);
+
+    const valinta = document.createElement('select');
+
+    for (const arvo of ['', '0', '1', '2', '3']) {
+      const vaihtoehto = document.createElement('option');
+      vaihtoehto.value = arvo;
+      vaihtoehto.textContent = arvo === '' ? 'Ei arvioitu' : arvo;
+      valinta.appendChild(vaihtoehto);
+    }
+
+    valinta.addEventListener('change', () => {
+      pariarvioinnit[rooli].pisteet[i] =
+        valinta.value === '' ? null : Number(valinta.value);
+    });
+
+    rivi.appendChild(valinta);
+    alue.appendChild(rivi);
+  });
+}
+
+luoParinPisteytys('tori');
+luoParinPisteytys('uke');
  </script></body></html>
