@@ -262,6 +262,20 @@ luoParinPisteytys('uke');
   document.getElementById(rooli + '-arviointi')
     .appendChild(painike);
 }
+  async function palautaPariarviointi(rooli) {
+  const id = pariarvioinnit[rooli].kokelasId;
+  if (!id) return;
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('arviointi')
+    .eq('id', id)
+    .single();
+
+  if (pariarvioinnit[rooli].kokelasId !== id) return;
+
+  if (error) {
+    alert('Arvioinnin haku epäonnistui: ' + error.message);
     return;
   }
 
