@@ -448,6 +448,13 @@ alue.querySelectorAll('select, button').forEach(kentta => {
   alert('Opettajan puollon päiväys puuttuu.');
   return;
 }
+   const { data: { user }, error: authError } =
+  await supabaseClient.auth.getUser();
+
+if (authError || !user) {
+  alert('Opettajan kirjautuminen vaaditaan.');
+  return;
+}
 const hakemusId = state.hakemusId;
 
   if (!confirm('Siirretäänkö ' + state.name +
@@ -460,6 +467,7 @@ const hakemusId = state.hakemusId;
   vyöarvo: '5.kyu',
   tila: 'jonossa',
   opettaja: state.teacher.trim(),
+     puoltaja_id: user.id,
   puolto: state.approval,
   puolto_pvm: state.date,
 hakemus_id: hakemusId
