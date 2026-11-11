@@ -15,7 +15,11 @@ const key='jukara-5kyu-form-v7-test';let state={name:'',scores:Array(items.lengt
 try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved&&Array.isArray(saved.scores)&&saved.scores.length===items.length)state={...state,...saved};}catch(e){}
 const $=id=>document.getElementById(id);$('intro').textContent="Arvioi itse oma osaamisesi. Kun olet saavuttanut suurimmassa osassa arvioitikohteita tason onnistuu yleensä, olet valmis vyökokeeseen. Pyydä opettajalta allekirjoitus, ja ota mukaan vyökokeeseen.";
 function save(){try{localStorage.setItem(key,JSON.stringify(state));}catch(e){} $('progress').textContent=`Arvioitu ${state.scores.filter(x=>x>=0).length} / ${items.length} kohtaa`;}
-function render(){ $('name').value=state.name;$('comment').value=state.comment;$('teacher').value=state.teacher;$('approval').checked=state.approval;$('date').value=state.date;const host=$('items');host.innerHTML='';items.forEach((s,i)=>{let sec=document.createElement('section');sec.className='card';let h=document.createElement('h2');h.textContent=(i+1)+'. '+s;sec.append(h);let grid=document.createElement('div');grid.className='choices';levels.forEach((level,j)=>{let label=document.createElement('label');label.className='choice';let radio=document.createElement('input');radio.type='radio';radio.name='q'+i;radio.value=j;radio.checked=state.scores[i]===j;radio.addEventListener('change',()=>{state.scores[i]=j;save()});label.append(radio,document.createTextNode(level));grid.append(label)});sec.append(grid);host.append(sec)});renderExam();save()}
+if (!state.hakemusId) {
+  state.hakemusId = crypto.randomUUID();
+  save();
+}
+ function render(){ $('name').value=state.name;$('comment').value=state.comment;$('teacher').value=state.teacher;$('approval').checked=state.approval;$('date').value=state.date;const host=$('items');host.innerHTML='';items.forEach((s,i)=>{let sec=document.createElement('section');sec.className='card';let h=document.createElement('h2');h.textContent=(i+1)+'. '+s;sec.append(h);let grid=document.createElement('div');grid.className='choices';levels.forEach((level,j)=>{let label=document.createElement('label');label.className='choice';let radio=document.createElement('input');radio.type='radio';radio.name='q'+i;radio.value=j;radio.checked=state.scores[i]===j;radio.addEventListener('change',()=>{state.scores[i]=j;save()});label.append(radio,document.createTextNode(level));grid.append(label)});sec.append(grid);host.append(sec)});renderExam();save()}
 for(const id of ['name','comment','teacher','date'])$(id).addEventListener('input',()=>{state[id]=$(id).value;save()});$('approval').addEventListener('change',()=>{state.approval=$('approval').checked;save()});
 function encode(s){return btoa(unescape(encodeURIComponent(JSON.stringify(s))))}
 function decode(s){return JSON.parse(decodeURIComponent(escape(atob(s.trim()))))}
@@ -435,13 +439,7 @@ alue.querySelectorAll('select, button').forEach(kentta => {
     alert('Oppilaan nimi puuttuu.');
     return;
   }
-const siirtoAvain = 'jukara-siirretty-' +
-  state.name.trim().toLowerCase();
 
-if (localStorage.getItem(siirtoAvain)) {
-  alert('Tämä kokelas on jo siirretty graduointijonoon.');
-  return;
-}
   if (!state.teacher.trim() || !state.approval) {
     alert('Opettajan nimi ja puolto vaaditaan.');
     return;
@@ -450,14 +448,7 @@ if (localStorage.getItem(siirtoAvain)) {
   alert('Opettajan puollon päiväys puuttuu.');
   return;
 }
-const hakemusAvain = 'jukara-hakemus-' +
-  state.name.trim().toLowerCase();
-
-let hakemusId = localStorage.getItem(hakemusAvain);
-  if (!hakemusId) {
-  hakemusId = crypto.randomUUID();
-  localStorage.setItem(hakemusAvain, hakemusId);
-}
+const hakemusId = state.hakemusId;
 
   if (!confirm('Siirretäänkö ' + state.name +
       ' graduointijonoon?')) return;
@@ -480,7 +471,7 @@ hakemus_id: hakemusId
       (error ? error.message : 'Tuntematon virhe'));
     return;
   }
-localStorage.setItem('jukara-siirretty-' + state.name.trim().toLowerCase(), String(data[0].id));
+
   siirtoPainike.disabled = true;
 siirtoPainike.textContent = 'Siirretty graduointijonoon';
   alert('Kokelas siirretty graduointijonoon.');
@@ -496,4 +487,16 @@ siirtoPainike.addEventListener('click', () => {
 });
 
 opettajanOsio.appendChild(siirtoPainike);
+ const uusiPainike = document.createElement('button');
+uusiPainike.type = 'button';
+uusiPainike.textContent = 'Uusi hakemus';
+
+uusiPainike.addEventListener('click', () => {
+  if (!confirm('Aloitetaanko uusi hakemus? Nykyiset lomaketiedot tyhjennetään tästä selaimesta.')) return;
+
+  localStorage.removeItem(key);
+  location.reload();
+});
+
+document.querySelector('.card').appendChild(uusiPainike); 
  </script></body></html>
