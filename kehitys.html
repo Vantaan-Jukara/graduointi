@@ -450,6 +450,10 @@ if (localStorage.getItem(siirtoAvain)) {
   alert('Opettajan puollon päiväys puuttuu.');
   return;
 }
+const hakemusAvain = 'jukara-hakemus-' +
+  state.name.trim().toLowerCase();
+
+let hakemusId = localStorage.getItem(hakemusAvain);
   if (!hakemusId) {
   hakemusId = crypto.randomUUID();
   localStorage.setItem(hakemusAvain, hakemusId);
