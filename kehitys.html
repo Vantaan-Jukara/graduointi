@@ -136,6 +136,10 @@ document.body.prepend(jonoLaatikko);
 }
   taytaKokelasvalinnat();
   const arviointialueet = document.createElement('div');
+  arviointialueet.style.display = 'grid';
+arviointialueet.style.gridTemplateColumns =
+  'repeat(2, minmax(0, 1fr))';
+arviointialueet.style.gap = '16px';
 arviointialueet.innerHTML = `
   <section class="card" id="tori-arviointi" hidden>
     <h2>Torin arviointi</h2>
