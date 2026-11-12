@@ -757,47 +757,105 @@ const tuloste = `
   <p><strong>Graduoija:</strong> ${tulostusteksti(data.graduoija || 'Ei merkitty')}</p>
   <p><strong>Päivämäärä:</strong> ${paivamaara}</p>
 `;
-  const ikkuna = window.open('', '_blank');
+  if (typeof html2pdf === 'undefined') {
+    alert('PDF-kirjasto ei latautunut. Päivitä sivu.');
+    return;
+  }
 
-if (!ikkuna) {
-  alert('Selain esti tulostusikkunan avaamisen.');
-  return;
-}
+  const alue = document.createElement('div');
+  alue.style.cssText =
+    'width:210mm;padding:15mm;box-sizing:border-box;' +
+    'background:white;color:#111;font-family:Arial,sans-serif;' +
+    'font-size:11pt;';
 
-ikkuna.document.write(`
-  <!DOCTYPE html>
-  <html lang="fi">
-  <head>
-    <meta charset="UTF-8">
-    <title>Graduointipäätös</title>
+  alue.innerHTML = `
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 25mm;
-        color: #111;
-      }
-      h1 { font-size: 20pt; }
-      h2 { font-size: 14pt; margin-top: 20px; }
+      h1 { font-size:20pt; }
+      h2 { font-size:14pt; margin-top:20px; }
       table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 10pt;
+        width:100%;
+        border-collapse:collapse;
+        font-size:10pt;
       }
-      th, td {
-        border: 1px solid #888;
-        padding: 6px;
-        text-align: left;
+      th,td {
+        border:1px solid #888;
+        padding:6px;
+        text-align:left;
       }
-      th { background: #eee; }
-      tr { break-inside: avoid; }
+      th { background:#eee; }
+      tr { break-inside:avoid; }
     </style>
-  </head>
-  <body>${tuloste}</body>
-  </html>
-`);
+    ${tuloste}
+  `;
 
-  
-ikkuna.document.close();
+  document.body.appendChild(alue);
+
+  try {
+    const asetukset = {
+      margin: 0,
+      filename: 'Graduointipaatos_' +
+        data.kokelas_nimi.replace(/[^a-zA-Z0-9_-]/g, '_') +
+        '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+
+    const pdfBlob = await html2pdf()
+      .set(asetukset)
+      .from(alue)
+      .outputPdf('blob');
+
+    const tiedosto = new File(
+      [pdfBlob],
+      asetukset.filename,
+      { type: 'application/pdf' }
+    );
+
+    window.jukaraPdfTiedosto = tiedosto;
+
+    let painike = document.getElementById('jaa-paatos-pdf');
+
+    if (!painike) {
+      painike = document.createElement('button');
+      painike.id = 'jaa-paatos-pdf';
+      painike.type = 'button';
+      painike.textContent = 'Lähetä graduointipäätös (PDF)';
+      document.getElementById('tulosta-paatos')
+        .insertAdjacentElement('afterend', painike);
+
+      painike.addEventListener('click', async () => {
+        const pdf = window.jukaraPdfTiedosto;
+
+        if (navigator.canShare &&
+            navigator.canShare({ files: [pdf] })) {
+          try {
+            await navigator.share({
+              files: [pdf],
+              title: 'Graduointipäätös'
+            });
+          } catch (virhe) {
+            if (virhe.name !== 'AbortError') {
+              alert('PDF:n jakaminen epäonnistui: ' + virhe.message);
+            }
+          }
+        } else {
+          alert('PDF:n suora jakaminen ei ole tässä selaimessa käytettävissä.');
+        }
+      });
+    }
+
+    painike.disabled = false;
+    alert('PDF on valmis. Paina Lähetä graduointipäätös (PDF).');
+
+  } catch (virhe) {
+    console.error(virhe);
+    alert('PDF:n muodostaminen epäonnistui: ' + virhe.message);
+  } finally {
+    alue.remove();
+  }
+}
 }
 
 document.getElementById('tulosta-paatos')
