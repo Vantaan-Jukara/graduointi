@@ -594,4 +594,45 @@ document.querySelector('.card').appendChild(uusiPainike);
 }
 
 naytaKirjautunutOpettaja();
+const tulostusOsio = document.createElement('section');
+tulostusOsio.className = 'card';
+
+tulostusOsio.innerHTML = `
+  <h2>Graduointipäätöksen tulostus</h2>
+  <label for="tulostus-kokelas">Valitse kokelas</label>
+  <select id="tulostus-kokelas">
+    <option value="">Valitse kokelas</option>
+  </select>
+  <button type="button" id="tulosta-paatos">
+    Tulosta graduointipäätös
+  </button>
+`;
+
+document.body.appendChild(tulostusOsio);
+async function taytaTulostusvalinnat() {   
+     const valinta = document.getElementById('tulostus-kokelas');
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('id, kokelas_nimi, tila')
+    .in('tila', ['hyvaksytty', 'hylatty'])
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    alert('Tulostettavien päätösten haku epäonnistui.');
+    return;
+  }
+
+  valinta.length = 1;
+
+  for (const kokelas of data) {
+    const vaihtoehto = document.createElement('option');
+    vaihtoehto.value = kokelas.id;
+    vaihtoehto.textContent =
+      kokelas.kokelas_nimi + ' (' + kokelas.tila + ')';
+    valinta.appendChild(vaihtoehto);
+  }
+}
+
+taytaTulostusvalinnat();
  </script></body></html>
