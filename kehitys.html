@@ -749,4 +749,107 @@ document.getElementById('tulosta-paatos')
     "'": '&#39;'
   })[merkki]);
 }
+   const suomisportOsio = document.createElement('section');
+suomisportOsio.className = 'card noprint';
+
+suomisportOsio.innerHTML = `
+  <h2>Suomisport-kirjausten luettelo</h2>
+  <p>Hyväksytyt graduoinnit: nimi, vyöarvo, päivämäärä ja graduoija.</p>
+  <button type="button" id="suomisport-luettelo">
+    Muodosta Suomisport-luettelo
+  </button>
+`;
+
+document.body.appendChild(suomisportOsio);
+   async function muodostaSuomisportLuettelo() {
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('kokelas_nimi, vyöarvo, paatos_pvm, graduoija')
+    .eq('tila', 'hyvaksytty')
+    .order('kokelas_nimi', { ascending: true });
+
+  if (error) {
+    alert('Suomisport-luettelon haku epäonnistui: ' + error.message);
+    return;
+  }
+
+  const vanha = document.getElementById('suomisport-tulokset');
+if (vanha) vanha.remove();
+
+const tulokset = document.createElement('div');
+tulokset.id = 'suomisport-tulokset';
+
+const taulukko = document.createElement('table');
+taulukko.style.width = '100%';
+taulukko.style.borderCollapse = 'collapse';
+
+const otsikot = ['Kokelas', 'Vyöarvo', 'Päivämäärä', 'Graduoija'];
+const otsikkorivi = taulukko.insertRow();
+
+for (const otsikko of otsikot) {
+  const solu = document.createElement('th');
+  solu.textContent = otsikko;
+  solu.style.padding = '8px';
+  otsikkorivi.appendChild(solu);
+}
+
+for (const kokelas of data) {
+  const rivi = taulukko.insertRow();
+  const arvot = [
+    kokelas.kokelas_nimi,
+    kokelas.vyöarvo,
+    kokelas.paatos_pvm
+      ? kokelas.paatos_pvm.split('-').reverse().join('.')
+      : 'Ei merkitty',
+    kokelas.graduoija || 'Ei merkitty'
+  ];
+
+  for (const arvo of arvot) {
+    const solu = rivi.insertCell();
+    solu.textContent = arvo || '';
+    solu.style.padding = '8px';
+    solu.style.borderTop = '1px solid #ccc';
+  }
+}
+
+tulokset.appendChild(taulukko);
+suomisportOsio.appendChild(tulokset);const tulostaPainike = document.createElement('button');
+tulostaPainike.type = 'button';
+tulostaPainike.textContent = 'Tulosta Suomisport-luettelo';
+
+tulostaPainike.onclick = () => {
+  const ikkuna = window.open('', '_blank');
+
+  if (!ikkuna) {
+    alert('Selain esti tulostusikkunan.');
+    return;
+  }
+
+  ikkuna.document.write(`
+    <!DOCTYPE html>
+    <html lang="fi">
+    <head>
+      <meta charset="UTF-8">
+      <title>Suomisport-luettelo</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20mm; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #999; text-align: left; }
+      </style>
+    </head>
+    <body>
+      <h1>Vantaan Jukara – Hyväksytyt graduoinnit</h1>
+      ${taulukko.outerHTML}
+    </body>
+    </html>
+  `);
+
+  ikkuna.document.close();
+};
+
+tulokset.appendChild(tulostaPainike);
+}
+
+document.getElementById('suomisport-luettelo')
+  .addEventListener('click', muodostaSuomisportLuettelo);
  </script></body></html>
