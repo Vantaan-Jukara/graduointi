@@ -856,6 +856,15 @@ items.forEach((kohde, i) => {
 });
 
 y += 6;
+    const yhteispisteet = pisteet.reduce(
+  (summa, piste) => summa + (Number(piste) || 0), 0
+);
+
+kirjoita('PISTEYHTEENVETO', true, 12);
+kirjoita('Yhteispisteet: ' + yhteispisteet + ' / 48');
+kirjoita('Alin hyvaksyttava: 32 / 48');
+kirjoita('Lisavaatimus: jokaisesta ukemista vahintaan 2 pistetta');
+y += 6;
 kirjoita('PAATOS: ' + paatosTeksti, true, 13);
 kirjoita('Graduoija: ' + (data.graduoija || 'Ei merkitty'));
 kirjoita('Paivamaara: ' + paivamaara);
