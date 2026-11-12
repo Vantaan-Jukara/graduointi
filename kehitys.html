@@ -789,7 +789,11 @@ const tuloste = `
   `;
 
   document.body.appendChild(alue);
-
+ await new Promise(resolve =>
+    requestAnimationFrame(() =>
+      requestAnimationFrame(resolve)
+    )
+  );
   try {
     const asetukset = {
       margin: 0,
