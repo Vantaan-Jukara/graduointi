@@ -635,4 +635,28 @@ async function taytaTulostusvalinnat() {
 }
 
 taytaTulostusvalinnat();
+async function tulostaGraduointipaatos() {
+  const id = document.getElementById('tulostus-kokelas').value;
+
+  if (!id) {
+    alert('Valitse ensin kokelas.');
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('graduointijono')
+    .select('kokelas_nimi, vyöarvo, tila, arviointi, graduoija, paatos_pvm, opettaja, opettajan_kommentti')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    alert('Graduointipäätöksen haku epäonnistui.');
+    return;
+  }
+
+  console.log('Tulostettavan päätöksen tiedot:', data);
+}
+
+document.getElementById('tulosta-paatos')
+  .addEventListener('click', tulostaGraduointipaatos);   
  </script></body></html>
