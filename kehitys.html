@@ -64,6 +64,44 @@ $('print').onclick=()=>window.print();$('reset').onclick=()=>{if(confirm('Poiste
 const SUPABASE_URL = 'https://ahozpinochjixnnundvm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_Do7SnnEgI7Nc4XFDfut7rw_gxOUmP9Z';
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const kirjautumisOsio = document.createElement('section');
+kirjautumisOsio.className = 'card noprint';
+
+kirjautumisOsio.innerHTML = `
+  <h2>Opettajan ja graduoijan kirjautuminen</h2>
+  <input id="login-email" type="email"
+    placeholder="Sähköpostiosoite">
+  <input id="login-password" type="password"
+    placeholder="Salasana">
+  <button type="button" id="login-button">Kirjaudu</button>
+  <p id="login-status"></p>
+`;
+
+document.body.prepend(kirjautumisOsio);
+   document.getElementById('login-button').onclick = async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const status = document.getElementById('login-status');
+
+  if (!email || !password) {
+    status.textContent = 'Anna sähköpostiosoite ja salasana.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  status.textContent = error
+    ? 'Kirjautuminen epäonnistui: ' + error.message
+    : 'Kirjautuminen onnistui.';
+
+  if (!error) {
+    document.getElementById('login-password').value = '';
+    await naytaKirjautunutOpettaja();
+  }
+};
 supabaseClient.auth.onAuthStateChange((event) => {
   if (event !== 'PASSWORD_RECOVERY') return;
 
