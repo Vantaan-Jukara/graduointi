@@ -807,10 +807,50 @@ const tuloste = `
       pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    const pdfBlob = await html2pdf()
-      .set(asetukset)
-      .from(alue)
-      .outputPdf('blob');
+    if (y + korkeus > 275) {
+    pdf.addPage();
+    y = 20;
+  }
+}
+
+function kirjoita(teksti, lihavoitu = false, koko = 10) {
+  pdf.setFont('helvetica', lihavoitu ? 'bold' : 'normal');
+  pdf.setFontSize(koko);
+
+  const rivit = pdf.splitTextToSize(String(teksti ?? ''), leveys);
+  const korkeus = rivit.length * koko * 0.43 + 3;
+
+  varmistaTila(korkeus);
+  pdf.text(rivit, vasen, y);
+  y += korkeus;
+}
+
+kirjoita('VANTAAN JUKARA - GRADUOINTIPAATOS', true, 16);
+y += 5;
+
+kirjoita('Kokelas: ' + data.kokelas_nimi);
+kirjoita('Vyoarvo: ' + data.vyöarvo);
+kirjoita('Opettaja: ' + (data.opettaja || ''));
+kirjoita('Opettajan kommentti: ' +
+  (data.opettajan_kommentti || 'Ei kommenttia'));
+
+y += 6;
+kirjoita('GRADUOIJAN ARVIOINTI', true, 13);
+y += 3;
+
+items.forEach((kohde, i) => {
+  kirjoita(
+    (i + 1) + '. ' + kohde +
+    '  -  Pisteet: ' + (pisteet[i] ?? '-')
+  );
+});
+
+y += 6;
+kirjoita('PAATOS: ' + paatosTeksti, true, 13);
+kirjoita('Graduoija: ' + (data.graduoija || 'Ei merkitty'));
+kirjoita('Paivamaara: ' + paivamaara);
+
+const pdfBlob = pdf.output('blob');
 
     const tiedosto = new File(
       [pdfBlob],
