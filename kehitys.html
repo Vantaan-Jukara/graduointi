@@ -403,7 +403,26 @@ for (const rooli of ['tori', 'uke']) {
  async function vahvistaPariarviointi(rooli) {
   const tiedot = pariarvioinnit[rooli];
   const tulos = laskePariarviointi(rooli);
+const { data: { user }, error: authError } =
+  await supabaseClient.auth.getUser();
 
+if (authError || !user) {
+  alert('Graduoijan kirjautuminen vaaditaan.');
+  return;
+}
+
+const { data: graduoijaTiedot, error: rooliVirhe } =
+  await supabaseClient
+    .from('kayttajaroolit')
+    .select('nimi')
+    .eq('user_id', user.id)
+    .eq('rooli', 'graduoija')
+    .single();
+
+if (rooliVirhe || !graduoijaTiedot?.nimi?.trim()) {
+  alert('Graduoijan käyttöoikeutta tai nimeä ei löytynyt.');
+  return;
+}
   if (!tiedot.kokelasId) {
     alert('Valitse ensin kokelas.');
     return;
@@ -429,6 +448,8 @@ for (const rooli of ['tori', 'uke']) {
     .from('graduointijono')
     .update({
       tila: tiedot.paatos,
+      graduoija: graduoijaTiedot.nimi.trim(),
+paatos_pvm: new Date().toLocaleDateString('sv-SE'),
       arviointi: {
         pisteet: tiedot.pisteet,
         paatos: tiedot.paatos
