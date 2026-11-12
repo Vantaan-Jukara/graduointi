@@ -806,7 +806,17 @@ const tuloste = `
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
     };
+const pdf = new window.jspdf.jsPDF({
+  orientation: 'portrait',
+  unit: 'mm',
+  format: 'a4'
+});
 
+const leveys = 170;
+const vasen = 20;
+let y = 20;
+
+function varmistaTila(korkeus) {
     if (y + korkeus > 275) {
     pdf.addPage();
     y = 20;
