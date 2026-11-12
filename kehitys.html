@@ -100,6 +100,7 @@ document.body.prepend(kirjautumisOsio);
   if (!error) {
     document.getElementById('login-password').value = '';
     await naytaKirjautunutOpettaja();
+    await naytaKirjautunutGraduoija();
   }
 };
 supabaseClient.auth.onAuthStateChange((event) => {
@@ -622,7 +623,7 @@ document.querySelector('.card').appendChild(uusiPainike);
     .select('nimi')
     .eq('user_id', user.id)
     .eq('rooli', 'opettaja')
-    .single();
+  .maybeSingle();
 
   if (error || !data?.nimi) return;
 
@@ -632,6 +633,27 @@ document.querySelector('.card').appendChild(uusiPainike);
 }
 
 naytaKirjautunutOpettaja();
+async function naytaKirjautunutGraduoija() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from('kayttajaroolit')
+    .select('nimi')
+    .eq('user_id', user.id)
+    .eq('rooli', 'graduoija')
+    .maybeSingle();
+
+  if (error || !data?.nimi) return;
+document.getElementById('kirjautunut-graduoija')?.remove();
+  const tieto = document.createElement('p');
+  tieto.id = 'kirjautunut-graduoija';
+  tieto.textContent = 'Kirjautunut graduoija: ' + data.nimi;
+
+  kirjautumisOsio.appendChild(tieto);
+}
+
+naytaKirjautunutGraduoija();   
 const tulostusOsio = document.createElement('section');
 tulostusOsio.className = 'card';
 
